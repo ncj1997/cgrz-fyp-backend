@@ -12,7 +12,7 @@ from PIL import Image
 app = Flask(__name__)
 
 # Step 1: Extract dominant colors from multiple images using K-means clustering
-def extract_colors_kmeans(image_list, num_colors=5):
+def extract_colors_kmeans(image_list, num_colors=3):
     """
     Use K-means clustering to extract dominant colors from multiple images.
     
@@ -37,7 +37,7 @@ def extract_colors_kmeans(image_list, num_colors=5):
     colors = kmeans.cluster_centers_.astype(int)
 
     # Convert to HEX color format
-    return [f"#{r:02x}{g:02x}{b:02x}" for r, g, b in colors]
+    return [f"#{b:02x}{g:02x}{r:02x}" for r, g, b in colors]
 
 # Step 2: Extract deep features using a pre-trained CNN (VGG16)
 def extract_deep_features(image_list):
