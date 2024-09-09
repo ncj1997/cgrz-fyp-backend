@@ -1,5 +1,6 @@
 import time
 from flask import Flask, jsonify, request, send_file
+import numpy as np
 import api.camo_implant as camo_implant  # Import the function from the separate file
 import api.pattern_gen as pattern_gen
 from PIL import Image
@@ -15,7 +16,7 @@ def health_checker():
 
 @app.route('/generate-camouflage', methods=['POST'])
 def generate_camouflage():
- 
+    print("Function Called for Generating Camo")
     if 'images' not in request.files:
         return jsonify({"error": "No images part in the request"}), 400
     

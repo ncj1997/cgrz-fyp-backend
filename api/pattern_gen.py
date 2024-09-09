@@ -1,6 +1,6 @@
 import io
 import os
-import numpy as np # type: ignore
+import numpy as np 
 import cv2 # type: ignore
 from tensorflow.keras.applications.vgg16 import VGG16, preprocess_input # type: ignore
 from tensorflow.keras.preprocessing import image # type: ignore
