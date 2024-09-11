@@ -1,3 +1,4 @@
+from datetime import datetime
 import io
 import os
 import numpy as np 
@@ -141,9 +142,23 @@ def generate_camouflage(image_list,num_colors):
     # Generate the camouflage using the camouflage generator library
     camouflage_image = camogen.generate(camouflage_params)
     timestamp = time.strftime("%Y%m%d-%H%M%S")
-# Save the image to a BytesIO stream
-    img_io = io.BytesIO()
-    camouflage_image.save(img_io, 'PNG')
-    img_io.seek(0)
+    # # Save the image to a BytesIO stream
+    #     img_io = io.BytesIO()
+    #     camouflage_image.save(img_io, 'PNG')
+    #     img_io.seek(0)
 
-    return img_io
+
+    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+
+    output_file_path = f'./static/images/patterns/camouflaged_{timestamp}.png'
+
+    camouflage_image.save(output_file_path)
+
+    # IMAGE_FOLDER = os.path.join('static','images', 'patterns')
+
+     # Output path for the camouflaged image (it will be saved in the /images/pattern folder)
+    # final_output_path = os.path.join(IMAGE_FOLDER, output_file_path)
+
+    path_img = f'images/patterns/camouflaged_{timestamp}.png'
+
+    return path_img
