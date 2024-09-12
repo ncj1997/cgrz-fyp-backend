@@ -2,14 +2,14 @@
 venv/
 myenv/
 
-/detections/*
-!/detections/.gitignore
+static/images/detections/*
+!static/images/detections/.gitignore
 
-/imprint/*
-!/imprint/.gitignore
+static/images/imprint/*
+!static/images/imprint/.gitignore
 
-/patterns/*
-!/patterns/.gitignore
+static/images/patterns/*
+!static/images/patterns/.gitignore
 
 /temp/*
 !/temp/.gitignore
