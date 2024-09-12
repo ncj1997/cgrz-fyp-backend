@@ -1,69 +1,6 @@
 def checkHealth():
     return "I'm still alive "
 
-
-# import cv2
-# import torch
-# import numpy as np
-# from PIL import Image
-# import torchvision.transforms as transforms
-# import torchvision
-
-# def load_yolo_model():
-#     # Load pre-trained YOLOv5 model
-#     model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
-#     return model
-
-# def run_yolo_detection(model, image_path):
-#     results = model(image_path)
-#     results.show()
-
-# def preprocess_image(image_path):
-#     img = Image.open(image_path)
-#     transform = transforms.ToTensor()
-#     img_tensor = transform(img).unsqueeze(0)  # Add batch dimension
-#     return img_tensor
-
-# def run_mask_rcnn(img_tensor, threshold=0.5):
-#     model = torchvision.models.detection.maskrcnn_resnet50_fpn(pretrained=True)
-#     model.eval()
-#     with torch.no_grad():
-#         predictions = model(img_tensor)
-#     masks = predictions[0]['masks'][predictions[0]['scores'] > threshold]
-#     return masks
-
-# def tile_pattern(camouflage, mask_shape):
-#     camo_h, camo_w = camouflage.shape[:2]
-#     mask_h, mask_w = mask_shape[:2]
-#     tile_x = int(np.ceil(mask_w / camo_w))
-#     tile_y = int(np.ceil(mask_h / camo_h))
-#     tiled_camo = np.tile(camouflage, (tile_y, tile_x, 1))
-#     return tiled_camo[:mask_h, :mask_w]
-
-# def apply_camouflage(camo_img_path, original_image_path, output_path):
-#     # Load YOLOv5 model
-#     yolo_model = load_yolo_model()
-
-#     # Preprocess the original image for Mask R-CNN
-#     img_tensor = preprocess_image(original_image_path)
-
-#     # Run Mask R-CNN to get human masks
-#     human_masks = run_mask_rcnn(img_tensor)
-
-#     # Load camouflage pattern and tile it to match the human mask size
-#     camouflage = cv2.imread(camo_img_path)
-#     tiled_camo = tile_pattern(camouflage, human_masks[0].shape)
-
-#     # Apply the tiled camouflage pattern to the mask
-#     masked_camo = cv2.bitwise_and(tiled_camo, tiled_camo, mask=human_masks[0][0].cpu().numpy().astype(np.uint8))
-
-    
-#     # Save the final camouflaged image
-#     cv2.imwrite(f'./static/images/imprint/{output_path}', masked_camo)
-
-#     return 1
-
-
 import cv2
 import torch
 import numpy as np

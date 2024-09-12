@@ -6,7 +6,6 @@ import numpy as np
 import api.camo_implant as camo_implant  # Import the function from the separate file
 import api.pattern_gen as pattern_gen
 from PIL import Image
-from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 

@@ -8,7 +8,6 @@ from tensorflow.keras.preprocessing import image # type: ignore
 import camogen # Replace with the actual camouflage generator library
 from sklearn.cluster import KMeans # type: ignore
 import time
-from PIL import Image # type: ignore
 
 # Step 1: Extract dominant colors from multiple images using K-means clustering
 def extract_colors_kmeans(image_list, num_colors=3):
