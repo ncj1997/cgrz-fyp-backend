@@ -1,5 +1,18 @@
 # Ignore the virtual environment folder
 venv/
+myenv/
+
+/detections/*
+!/detections/.gitignore
+
+/imprint/*
+!/imprint/.gitignore
+
+/patterns/*
+!/patterns/.gitignore
+
+/temp/*
+!/temp/.gitignore
 
 # Ignore Python cache files
 __pycache__/
