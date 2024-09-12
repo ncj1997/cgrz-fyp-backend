@@ -1,0 +1,45 @@
+# Ignore the virtual environment folder
+venv/
+myenv/
+
+static/images/detections/*
+!static/images/detections/.gitignore
+
+static/images/imprint/*
+!static/images/imprint/.gitignore
+
+static/images/patterns/*
+!static/images/patterns/.gitignore
+
+/temp/*
+!/temp/.gitignore
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore the pip environment files
+*.env
+*.venv
+
+# Ignore IDE/editor config files (like VSCode, PyCharm, etc.)
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore environment variables (if you store them in a .env file)
+.env
+
+# Ignore log files
+*.log
+
+# Ignore compiled bytecode
+*.py[cod]
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore MacOS-specific files
+.DS_Store
