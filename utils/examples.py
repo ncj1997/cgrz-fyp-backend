@@ -17,6 +17,18 @@ parameters = {'width': 700, 'height': 700, 'polygon_size': 200, 'color_bleed': 6
              'spots': {'amount': 20000, 'radius': {'min': 7, 'max': 14}, 'sampling_variation': 10}}
 
 image = camogen.generate(parameters)
+
+#print print(parameters)
+
+def print_parameters(parameters):
+    for key, value in parameters.items():
+        if isinstance(value, dict):
+            print(f"{key}:")
+            for subkey, subvalue in value.items():
+                print(f"  {subkey}: {subvalue}")
+        else:
+            print(f"{key}: {value}")
+
 image.save('./images/green_blots.png')
 
 # Mighty Swede
