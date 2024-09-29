@@ -7,7 +7,9 @@ import api.camo_implant as camo_implant  # Import the function from the separate
 import api.pattern_gen as pattern_gen
 from PIL import Image
 
+from flask_cors import CORS # type: ignore
 app = Flask(__name__)
+CORS(app)
 
 TEMP_FOLDER = './temp'
 
