@@ -50,19 +50,19 @@ def progress():
 
             # Step 2: Image Preprocessing
             yield f"data: Step 2: Image Preprocessing\n\n"
-            time.sleep(1)
+            time.sleep(3)
 
             # Step 3: Applying Filters
             yield f"data: Step 3: Applying Filters\n\n"
-            time.sleep(1)
+            time.sleep(3)
 
             # Step 4: Generating Camouflage
             yield f"data: Step 4: Generating Camouflage\n\n"
-            time.sleep(1)
+            time.sleep(3)
 
             # Step 5: Finishing
             yield f"data: Step 5: Finishing\n\n"
-            time.sleep(1)
+            time.sleep(3)
 
             # Once processing is done, send the final image URL
             image_url = "http://backend.intelilab.click/static/images/patterns/camouflaged_20240929010354.png"
