@@ -75,18 +75,17 @@ def progress():
     return Response(generate(), mimetype='text/event-stream')
 
 # Route to use the function from the other file
-@app.route('/health_check_camo_impan', methods=['GET'])
+@app.route('/health_check', methods=['GET'])
 def health_checker():
-    # Call the function from my_functions.py
-    result = camo_implant.checkHealth()
-    return jsonify({"result": result})
+    print("Function Called for Health Check @ " + time.strftime("%Y%m%d-%H%M%S"))
+    return jsonify({"result": "Server Running"})
 
 
 
 
 @app.route('/generate-camouflage', methods=['POST'])
 def generate_camouflage():
-    print("Function Called for Generating Camo")
+    print("Function Called for Generating Camo" + time.strftime("%Y%m%d-%H%M%S"))
     if 'images' not in request.files:
         return jsonify({"error": "No images part in the request"}), 400
     
@@ -101,14 +100,10 @@ def generate_camouflage():
         img = np.array(img)
         image_list.append(img)
 
-    # Extract colors and deep features
-    num_colors = int(request.form.get('num_colors', 5))
 
-    final_camo_file_name = pattern_gen.generate_camouflage(image_list=image_list,num_colors=num_colors)
 
-    # timestamp = time.strftime("%Y%m%d-%H%M%S")
 
-     # Return the URL of the saved image to the frontend
+    final_camo_file_name = "sample_image_path.jpg"
     image_url = url_for('static', filename=final_camo_file_name, _external=True)
 
     return jsonify({'image_url': image_url})
