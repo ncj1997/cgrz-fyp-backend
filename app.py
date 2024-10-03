@@ -107,6 +107,7 @@ def is_image_file(file):
     except (IOError, SyntaxError):
         return False
 
+
 @app.route('/generate-camouflage', methods=['POST'])
 def generate_camouflage():
     
@@ -154,7 +155,6 @@ def generate_camouflage():
         except Exception as e:
             return jsonify({'error': f"Error saving image {image_file.filename}: {e}"}), 400
     
-    
     base_url = request.host_url
 
     def generate():
@@ -163,7 +163,6 @@ def generate_camouflage():
             # Step 1: Image Uploading
             yield f"data: Step 1: Images Received \n\n"
             time.sleep(1)  # Simulate the delay for processing
-            print(folder_path)
             collage_from_GAN = generate_camouflage_and_collage(folder_path,env_type,timestamp)
             # Remove './static/' to get the relative path
             relative_path = collage_from_GAN.replace('./static/', '')
@@ -172,12 +171,12 @@ def generate_camouflage():
 
             # Step 2: 
             yield f"data: Step 2: Passing to Model to generate GAN Pattern. image_url: {url_for_gan_collage} \n\n "
-            time.sleep(1)
+            time.sleep(5)
             #call the collage function here
 
             # Step 3: 
-            noise_blened_image = generateNoiseImage(folder_id=timestamp,existing_image_path=url_for_gan_collage)
-            yield f"data: Step 3: Generate Noise Blended Image. image_url: {noise_blened_image}\n\n"
+            noise_blend_image = generateNoiseImage(folder_id=timestamp, existing_image_path=collage_from_GAN)
+            yield f"data: Step 3: Generate Noise Blended Image. image_url: {noise_blend_image}\n\n"
             time.sleep(1)
 
             # Step 4:
@@ -197,8 +196,6 @@ def generate_camouflage():
 
     # Return the event-stream response
     return Response(generate(), mimetype='text/event-stream')
-
-    # return send_file (final_camo_file, mimetype='image/png', as_attachment=True, download_name=f"adaptive_camouflage_{timestamp}.png")
 
 
 def add_timestamp_to_filename(filename):

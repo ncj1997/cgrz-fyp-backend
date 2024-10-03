@@ -99,7 +99,6 @@ def create_collage(images,folder_id, w=400, h=400, aspect=1.77):
 
      # Create a unique folder path for this upload
     folder_path = os.path.join("./static/images/patterns/", folder_id)
-    print("*******",folder_path)
     # Make the directory if it doesn't exist
     os.makedirs(folder_path, exist_ok=True)
 

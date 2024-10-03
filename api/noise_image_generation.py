@@ -15,7 +15,7 @@ def generateRandomNoise():
 
 def generateSimplexNoise():
 
-    (w, h) = (1000,1000)
+    (w, h) = (1000, 1000)
     arr = []
     simp = OpenSimplex(seed=int(time.time()))
     for y in range(0, h):
@@ -43,7 +43,7 @@ def generateNoiseImage(folder_id, existing_image_path=None ):
     final_values = []
 
     # Process the existing image if provided
-    if existing_image:
+    if existing_image_path:
         existing_image = Image.open(existing_image_path)
         existing_image = existing_image.resize((w, h))  # Resize to match noise size
         existing_image_np = np.array(existing_image) / 255.0  # Normalize to [0, 1] range
@@ -98,10 +98,13 @@ def generateNoiseImage(folder_id, existing_image_path=None ):
     blended_image.convert(mode="RGB")
     
     folder_path = os.path.join("./static/images/patterns/", folder_id)
+    print("folder path", folder_path)
 
-    noise_img_path = f"{folder_path}/generated_noise_blended_image.jpg"
+    noise_img_path = f"{folder_path}/generated_noise_blended_image.png"
+    print("noise image path", noise_img_path)
     # Save the final collage image
-    blended_image.save(noise_img_path)
+
+    blended_image.save(noise_img_path, 'PNG')
 
     return noise_img_path
 
