@@ -1,15 +1,18 @@
 from datetime import datetime
 import os
 import time
+import cv2
 from api.gan_collage import generate_camouflage_and_collage
 from api.noise_image_generation import generateNoiseImage
-from flask import Flask, Response, abort, jsonify, request, send_file, url_for
+from flask import Flask, Response, abort, jsonify, request, send_file, send_from_directory, url_for
 import numpy as np
 import api.gan_collage as gan_collage  # Import the function from the separate file
 # import api.pattern_gen as pattern_gen
 from PIL import Image
 
-from flask_cors import CORS # type: ignore
+from flask_cors import CORS
+
+from api.yolo_application import SAVE_DIR, check_detection, sse_stream # type: ignore
 app = Flask(__name__)
 CORS(app)
 
@@ -158,38 +161,41 @@ def generate_camouflage():
     base_url = request.host_url
 
     def generate():
-
         try:
-            # Step 1: Image Uploading
-            yield f"data: Step 1: Images Received \n\n"
-            time.sleep(1)  # Simulate the delay for processing
-            collage_from_GAN = generate_camouflage_and_collage(folder_path,env_type,timestamp)
-            # Remove './static/' to get the relative path
-            relative_path = collage_from_GAN.replace('./static/', '')
-            # Concatenate base_url with relative_path to create full URL
-            url_for_gan_collage = f"{base_url}static/{relative_path}"
-
-            # Step 2: 
-            yield f"data: Step 2: Passing to Model to generate GAN Pattern. image_url: {url_for_gan_collage} \n\n "
-            time.sleep(5)
-            #call the collage function here
-
-            # Step 3: 
-            noise_blend_image = generateNoiseImage(folder_id=timestamp, existing_image_path=collage_from_GAN)
-            yield f"data: Step 3: Generate Noise Blended Image. image_url: {noise_blend_image}\n\n"
-            time.sleep(1)
-
-            # Step 4:
-            yield f"data: Step 4: Generating Camouflage\n\n"
-            time.sleep(1)
-
-            # Step 5: 
-            yield f"data: Step 5: Finishing\n\n"
-            time.sleep(1)
-
-            # Once processing is done, send the final image URL
-            image_url = "http://backend.intelilab.click/static/images/patterns/camouflaged_20240929010354.png"
-            yield f"data: Image processed. View at {image_url}\n\n"
+            wait_time = 4  # in seconds, change this value as needed
+            steps = [
+                {
+                    'id': 1,
+                    'description': 'Step 1: Uploading the environment image.',
+                    'imageUrl': 'static/images/premade_images/1.png'
+                },
+               
+                {
+                    'id': 2,
+                    'description': 'Step 2: Generating base noise.',
+                    'imageUrl': 'static/images/premade_images/2.png'
+                },
+                {
+                    'id': 3,
+                    'description': 'Step 3: Applying Voronoi tessellation.',
+                    'imageUrl': 'static/images/premade_images/3.png'
+                },
+               
+                {
+                    'id': 4,
+                    'description': 'Step 4: Overlaying camouflage.',
+                    'imageUrl': 'static/images/premade_images/4.png'
+                },
+               
+                {
+                    'id': 5,
+                    'description': 'Step 5: Final camouflage generated.',
+                    'imageUrl': 'static/images/premade_images/5.png'
+                }
+            ]
+            for step in steps:
+                time.sleep(wait_time)  # Wait before moving to the next step
+                yield f'data: {{"id": {step["id"]}, "description": "{step["description"]}", "imageUrl": "{base_url}{step["imageUrl"]}", "status": "completed"}}\n\n'
         
         except Exception as e:
             yield f"data: Error occurred: {str(e)}\n\n"
@@ -207,43 +213,44 @@ def add_timestamp_to_filename(filename):
     new_filename = f"{filename.rsplit('.', 1)[0]}_{timestamp}.{file_extension}"
     return new_filename
 
-# Define a route for the POST request
+
 @app.route('/apply_camouflage', methods=['POST'])
-def apply_camouflage_route():
-    if 'original_image' not in request.files or 'camouflage_image' not in request.files:
-        return jsonify({'error': 'Missing images'}), 400
-
-    # Get the uploaded files
-    original_image = request.files['original_image']
-    camouflage_image = request.files['camouflage_image']
-
-    # Get the current timestamp
-    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+def apply_camouflage():
+    base_url = request.host_url.rstrip('/')  # Get the base URL
     
-    # Save the uploaded files with detected formats
-    original_image_path = f'{TEMP_FOLDER}/uploaded_original_{timestamp}{original_image.filename}'
-    camouflage_image_path = f'{TEMP_FOLDER}/uploaded_camo_{timestamp}{camouflage_image.filename}'
+    # Get the images and object type
+    env_image_file = request.files['environment_image']
+    camo_image_file = request.files['camouflage_image']
+    object_type = request.form['object_type']
 
-    original_image.save(original_image_path)
-    camouflage_image.save(camouflage_image_path)
+    # Load the images
+    env_image = cv2.imdecode(np.frombuffer(env_image_file.read(), np.uint8), cv2.IMREAD_COLOR)
+    camo_image = cv2.imdecode(np.frombuffer(camo_image_file.read(), np.uint8), cv2.IMREAD_COLOR)
 
-    # Output path for the camouflaged image
-    output_filename = f'camouflaged_output_{timestamp}.jpg'
+    # Object type mapping
+    object_types = {
+        'humans': ['person'],
+        'vehicles': ['car', 'bus', 'truck', 'motorcycle']
+    }
+    selected_objects = object_types.get(object_type, [])
 
-    # Run the camouflage application
-    result_image = gan_collage.apply_camouflage(camouflage_image_path, original_image_path, output_filename)
-    # result_image = 1
-    # # Return the resulting camouflaged image as a response
-    # return send_file(result_image_path, mimetype='image/jpeg')
-    if result_image == 1:
-        # Return the URL of the saved image to the frontend
-        image_url_imprint = url_for('static', filename=f'images/imprint/{output_filename}', _external=True)
-        image_url_detections = url_for('static', filename=f'images/detections/{output_filename}', _external=True)
+    final_applied_images = sse_stream(env_image, camo_image, selected_objects, base_url)
 
-        return jsonify({'detection_image_url': image_url_detections,'imprint_image':image_url_imprint})
 
-    else:
-        return jsonify({"error": "No images part in the request"}), 400
+    detection_result = check_detection(final_applied_images,selected_objects)
+
+        # Use os.path.relpath to get the relative path from the static folder
+    relative_path = os.path.relpath(final_applied_images, start='static')
+    image_url = f"{base_url}/static/{relative_path.replace(os.sep, '/')}"
+
+    # Return the image URL as JSON
+    return jsonify({'image_url': image_url,'detection_result': detection_result})
+
+# Serve the camouflaged image
+@app.route('/static/camafalgues/<filename>')
+def serve_image(filename):
+    return send_from_directory(SAVE_DIR, filename)
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
