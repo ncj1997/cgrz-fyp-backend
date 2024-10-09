@@ -186,7 +186,7 @@ def generate_camouflage():
                
                 {
                     'id': 4,
-                    'description': 'Step 4: Applieed colors to noise image',
+                    'description': 'Step 4: Applied colors to noise image',
                     'imageUrl': 'static/images/premade_images/4.png',
                     'waitTime': 8,
                 },
