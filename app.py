@@ -166,35 +166,55 @@ def generate_camouflage():
             steps = [
                 {
                     'id': 1,
-                    'description': 'Step 1: Uploading the environment image.',
-                    'imageUrl': 'static/images/premade_images/1.png'
+                    'description': 'Step 1: Collage has been generated.',
+                    'imageUrl': 'static/images/premade_images/1.png',
+                    'waitTime': 4,
                 },
                
                 {
                     'id': 2,
-                    'description': 'Step 2: Generating base noise.',
-                    'imageUrl': 'static/images/premade_images/2.png'
+                    'description': 'Step 2: Generated Noise Image',
+                    'imageUrl': 'static/images/premade_images/2.png',
+                    'waitTime': 4,
                 },
                 {
                     'id': 3,
-                    'description': 'Step 3: Applying Voronoi tessellation.',
-                    'imageUrl': 'static/images/premade_images/3.png'
+                    'description': 'Step 3: Analzed dominant colors',
+                    'imageUrl': 'static/images/premade_images/3.png',
+                    'waitTime': 4,
                 },
                
                 {
                     'id': 4,
-                    'description': 'Step 4: Overlaying camouflage.',
-                    'imageUrl': 'static/images/premade_images/4.png'
+                    'description': 'Step 4: Applieed colors to noise image',
+                    'imageUrl': 'static/images/premade_images/4.png',
+                    'waitTime': 8,
                 },
                
                 {
                     'id': 5,
-                    'description': 'Step 5: Final camouflage generated.',
-                    'imageUrl': 'static/images/premade_images/5.png'
-                }
+                    'description': 'Step 5: First Iteration of Tessellation Completed',
+                    'imageUrl': 'static/images/premade_images/5.png',
+                    'waitTime': 15,
+                },
+
+                {
+                    'id': 6,
+                    'description': 'Step 6: First Iteration of Tessellation Completed',
+                    'imageUrl': 'static/images/premade_images/6.png',
+                    'waitTime': 15,
+                },
+
+                {
+                    'id': 7,
+                    'description': 'Step 7: Second Iteration of Tessellation Completed',
+                    'imageUrl': 'static/images/premade_images/7.png',
+                    'waitTime': 15,
+                },
+               
             ]
             for step in steps:
-                time.sleep(wait_time)  # Wait before moving to the next step
+                time.sleep(step['waitTime'])  # Wait before moving to the next step
                 yield f'data: {{"id": {step["id"]}, "description": "{step["description"]}", "imageUrl": "{base_url}{step["imageUrl"]}", "status": "completed"}}\n\n'
         
         except Exception as e:
@@ -216,22 +236,43 @@ def add_timestamp_to_filename(filename):
 
 @app.route('/apply_camouflage', methods=['POST'])
 def apply_camouflage():
-    base_url = request.host_url.rstrip('/')  # Get the base URL
+
+
+    base_url = request.host_url.rstrip('/') 
     
+    # Check if the environment image file is provided
+    if 'environment_image' not in request.files:
+        return jsonify({'error': 'Environment image file is missing'}), 400
+    
+    # Check if the camouflage image file is provided
+    if 'camouflage_image' not in request.files:
+        return jsonify({'error': 'Camouflage image file is missing'}), 400
+    
+    # Check if the object type is provided in the form data
+    if 'object_type' not in request.form:
+        return jsonify({'error': 'Object type is missing'}), 400
     # Get the images and object type
     env_image_file = request.files['environment_image']
     camo_image_file = request.files['camouflage_image']
     object_type = request.form['object_type']
 
+    # Object type mapping
+    object_types = {
+        'human': ['person'],
+        'vehicles': ['car', 'bus', 'truck', 'motorcycle']
+    }
+
+    if not object_type or object_type not in object_types:
+        return jsonify({'error': 'Invalid or missing object type'}), 400
+    
+
     # Load the images
     env_image = cv2.imdecode(np.frombuffer(env_image_file.read(), np.uint8), cv2.IMREAD_COLOR)
     camo_image = cv2.imdecode(np.frombuffer(camo_image_file.read(), np.uint8), cv2.IMREAD_COLOR)
 
-    # Object type mapping
-    object_types = {
-        'humans': ['person'],
-        'vehicles': ['car', 'bus', 'truck', 'motorcycle']
-    }
+    
+
+    # Get the list of objects for the specified object type
     selected_objects = object_types.get(object_type, [])
 
     final_applied_images = sse_stream(env_image, camo_image, selected_objects, base_url)
