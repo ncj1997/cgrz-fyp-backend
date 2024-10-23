@@ -235,7 +235,7 @@ def apply_camouflage():
     # image_url = f"{base_url}/static/{relative_path.replace(os.sep, '/')}"
     image_url = f"{base_url}/static/camafalgues/camouflaged_step3_20241023214489.png"
     # Return the image URL as JSON
-    detection_result = ""
+    # detection_result = ""
     return jsonify({'image_url': image_url,'detection_result': detection_result})
 
 # Serve the camouflaged image
