@@ -168,48 +168,48 @@ def generate_camouflage():
                     'id': 1,
                     'description': 'Step 1: Collage has been generated.',
                     'imageUrl': 'static/images/premade_images/v2/1.png',
-                    'waitTime': 4,
+                    'waitTime': 15,
                 },
                
                 {
                     'id': 2,
                     'description': 'Step 2: Generated Noise Image',
                     'imageUrl': 'static/images/premade_images/v2/2.png',
-                    'waitTime': 4,
+                    'waitTime': 20,
                 },
                 {
                     'id': 3,
                     'description': 'Step 3: Analzed dominant colors',
                     'imageUrl': 'static/images/premade_images/v2/3.png',
-                    'waitTime': 4,
+                    'waitTime': 10,
                 },
                
                 {
                     'id': 4,
                     'description': 'Step 4: Applied colors to noise image',
                     'imageUrl': 'static/images/premade_images/v2/4.png',
-                    'waitTime': 8,
+                    'waitTime': 10,
                 },
                
                 {
                     'id': 5,
                     'description': 'Step 5: First Iteration of Tessellation Completed',
                     'imageUrl': 'static/images/premade_images/v2/5.png',
-                    'waitTime': 20,
+                    'waitTime': 120,
                 },
 
                 {
                     'id': 6,
                     'description': 'Step 6: Second Iteration of Tessellation Completed',
                     'imageUrl': 'static/images/premade_images/v2/6.png',
-                    'waitTime': 20,
+                    'waitTime': 120,
                 },
 
                 {
                     'id': 7,
                     'description': 'Step 7: Final Camouflage Generated',
                     'imageUrl': 'static/images/premade_images/v2/7.png',
-                    'waitTime': 20,
+                    'waitTime': 110,
                 },
                
             ]
