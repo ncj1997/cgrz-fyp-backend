@@ -167,56 +167,130 @@ def generate_camouflage():
                 {
                     'id': 1,
                     'description': 'Step 1: Collage has been generated.',
-                    'imageUrl': 'static/images/premade_images/1.png',
+                    'imageUrl': 'static/images/premade_images/v2/1.png',
                     'waitTime': 4,
                 },
                
                 {
                     'id': 2,
                     'description': 'Step 2: Generated Noise Image',
-                    'imageUrl': 'static/images/premade_images/2.png',
+                    'imageUrl': 'static/images/premade_images/v2/2.png',
                     'waitTime': 4,
                 },
                 {
                     'id': 3,
                     'description': 'Step 3: Analzed dominant colors',
-                    'imageUrl': 'static/images/premade_images/3.png',
+                    'imageUrl': 'static/images/premade_images/v2/3.png',
                     'waitTime': 4,
                 },
                
                 {
                     'id': 4,
                     'description': 'Step 4: Applied colors to noise image',
-                    'imageUrl': 'static/images/premade_images/4.png',
+                    'imageUrl': 'static/images/premade_images/v2/4.png',
                     'waitTime': 8,
                 },
                
                 {
                     'id': 5,
                     'description': 'Step 5: First Iteration of Tessellation Completed',
-                    'imageUrl': 'static/images/premade_images/5.png',
-                    'waitTime': 15,
+                    'imageUrl': 'static/images/premade_images/v2/5.png',
+                    'waitTime': 20,
                 },
 
                 {
                     'id': 6,
-                    'description': 'Step 6: First Iteration of Tessellation Completed',
-                    'imageUrl': 'static/images/premade_images/6.png',
-                    'waitTime': 15,
+                    'description': 'Step 6: Second Iteration of Tessellation Completed',
+                    'imageUrl': 'static/images/premade_images/v2/6.png',
+                    'waitTime': 20,
                 },
 
                 {
                     'id': 7,
-                    'description': 'Step 7: Second Iteration of Tessellation Completed',
-                    'imageUrl': 'static/images/premade_images/7.png',
-                    'waitTime': 15,
+                    'description': 'Step 7: Final Camouflage Generated',
+                    'imageUrl': 'static/images/premade_images/v2/7.png',
+                    'waitTime': 20,
                 },
                
             ]
             for step in steps:
                 time.sleep(step['waitTime'])  # Wait before moving to the next step
                 yield f'data: {{"id": {step["id"]}, "description": "{step["description"]}", "imageUrl": "{base_url}{step["imageUrl"]}", "status": "completed"}}\n\n'
-        
+            
+            
+
+            ##########################################################################
+            #                            Step 1: Collage Generation                  #
+            ##########################################################################
+
+            # time.sleep(1)  # Simulate the delay for processing
+            # collage_from_GAN = generate_camouflage_and_collage(folder_path,env_type,timestamp)
+            # # Remove './static/' to get the relative path
+            # relative_path = collage_from_GAN.replace('./static/', '')
+            # # Concatenate base_url with relative_path to create full URL
+            # url_for_gan_collage = f"{base_url}static/{relative_path}"
+            # yield f"data: Step 2: Passing to Model to generate GAN Pattern. image_url: {url_for_gan_collage} \n\n "
+            # yield f'data: {{"id": 1, "description": "", "imageUrl": "{base_url}{step["imageUrl"]}", "status": "completed"}}\n\n'
+            
+            # time.sleep(5)
+
+
+
+
+            ##########################################################################
+            #                             Step 2: Generated Noise Image              #
+            ##########################################################################
+
+
+
+
+
+            ##########################################################################
+            #                             Step 3: Analyzed dominant colors           #
+            ##########################################################################
+
+
+
+
+
+            ##########################################################################
+            #                             Step 4: Applied colors to noise image      #
+            ##########################################################################
+
+
+
+
+            ##########################################################################
+            #            Step 5: First Iteration of Tessellation Completed           #
+            ##########################################################################
+
+
+
+
+
+            ##########################################################################
+            #            Step 6: First Iteration of Tessellation Completed           #
+            ##########################################################################
+
+
+
+
+
+            ##########################################################################
+            #            Step 7: Second Iteration of Tessellation Completed          #
+            ##########################################################################
+
+
+
+            # # Step 3: 
+            # noise_blend_image = generateNoiseImage(folder_id=timestamp, existing_image_path=collage_from_GAN)
+            # yield f"data: Step 3: Generate Noise Blended Image. image_url: {noise_blend_image}\n\n"
+            # time.sleep(1)
+
+
+
+
+
         except Exception as e:
             yield f"data: Error occurred: {str(e)}\n\n"
 
