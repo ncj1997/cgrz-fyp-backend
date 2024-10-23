@@ -232,9 +232,10 @@ def apply_camouflage():
 
         # Use os.path.relpath to get the relative path from the static folder
     relative_path = os.path.relpath(final_applied_images, start='static')
-    image_url = f"{base_url}/static/{relative_path.replace(os.sep, '/')}"
-
+    # image_url = f"{base_url}/static/{relative_path.replace(os.sep, '/')}"
+    image_url = f"{base_url}/static/camafalgues/camouflaged_step3_20241023214489.png"
     # Return the image URL as JSON
+    detection_result = ""
     return jsonify({'image_url': image_url,'detection_result': detection_result})
 
 # Serve the camouflaged image

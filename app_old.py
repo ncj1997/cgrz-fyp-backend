@@ -361,6 +361,13 @@ def apply_camouflage():
     # Return the image URL as JSON
     return jsonify({'image_url': image_url,'detection_result': detection_result})
 
+@app.route('/static/images/<path:subdir>/<filename>')
+def download_image(subdir, filename):
+    # Assuming all the images are stored in the 'premade_images' folder
+    path = f'./static/images/{subdir}/{filename}'
+    return send_file(path, as_attachment=True, attachment_filename=filename)
+
+
 # Serve the camouflaged image
 @app.route('/static/camafalgues/<filename>')
 def serve_image(filename):

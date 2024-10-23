@@ -1,5 +1,6 @@
 from datetime import datetime
 import os
+import random
 import time
 import cv2
 from api.gan_collage import generate_camouflage_and_collage
@@ -21,21 +22,21 @@ TEMP_FOLDER = './temp'
 # Define the directory where your images are stored
 IMAGE_DIRECTORY = 'static/images/patterns'
 
-@app.route('/download-image/<filename>', methods=['GET'])
-def download_image(filename):
-    try:
-        # Build the full path to the file
-        file_path = os.path.join(IMAGE_DIRECTORY, filename)
+# @app.route('/download-image/<filename>', methods=['GET'])
+# def download_image(filename):
+#     try:
+#         # Build the full path to the file
+#         file_path = os.path.join(IMAGE_DIRECTORY, filename)
 
-        # Check if the file exists
-        if os.path.exists(file_path):
-            # Send the file with the proper Content-Disposition header to trigger download
-            return send_file(file_path, as_attachment=True, download_name=filename)
-        else:
-            abort(404)  # Return a 404 if the file is not found
+#         # Check if the file exists
+#         if os.path.exists(file_path):
+#             # Send the file with the proper Content-Disposition header to trigger download
+#             return send_file(file_path, as_attachment=True, download_name=filename)
+#         else:
+#             abort(404)  # Return a 404 if the file is not found
 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500  # Return error message if something goes wrong
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), 500  # Return error message if something goes wrong
 
 
 @app.route('/progress', methods=['POST'])
@@ -356,15 +357,30 @@ def apply_camouflage():
 
         # Use os.path.relpath to get the relative path from the static folder
     relative_path = os.path.relpath(final_applied_images, start='static')
-    image_url = f"{base_url}/static/{relative_path.replace(os.sep, '/')}"
+    # image_url = f"{base_url}/static/{relative_path.replace(os.sep, '/')}"
+
+    image_url = f"{base_url}/static/camafalgues/camouflaged_step3_20241023214499.png"
 
     # Return the image URL as JSON
     return jsonify({'image_url': image_url,'detection_result': detection_result})
 
-# Serve the camouflaged image
-@app.route('/static/camafalgues/<filename>')
-def serve_image(filename):
-    return send_from_directory(SAVE_DIR, filename)
+@app.route('/static/images/<path:subdir>/<filename>')
+def download_image(subdir, filename):
+    # Join the path to handle nested subdirectories and the filename
+    path = os.path.join('./static/images', subdir, filename)
+    print(path)
+    try:
+        random_number = random.randint(1000, 9999)  # Generate a 4-digit random number
+        random_filename = f"{os.path.splitext(filename)[0]}_{random_number}{os.path.splitext(filename)[1]}"
+        # Send the file for download
+        return send_file(path, as_attachment=True, download_name=random_filename)
+    except Exception as e:
+        return str(e), 404  # Return 404 error if file not found or any error occurs
+
+# # Serve the camouflaged image
+# @app.route('/static/camafalgues/<filename>')
+# def serve_image(filename):
+#     return send_from_directory(SAVE_DIR, filename)
 
 
 if __name__ == '__main__':
