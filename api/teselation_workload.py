@@ -224,7 +224,7 @@ def final_comouflague(single_color,second_veranoi, folder_id):
 
     # display(third_voronoi)
     import copy
-    bg2 = copy.deepcopy(bg)
+    bg2 = copy.deepcopy(second_veranoi)
     bg2.paste(third_voronoi, (0, 0), third_voronoi)
     # display(bg2)
 

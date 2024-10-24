@@ -108,3 +108,62 @@ def generateNoiseImage(folder_id, existing_image_path=None ):
     return noise_img_path
 
 
+def generateNoiseImageGAN(existing_image=None):
+    (w, h) = (1000, 1000)  # Dimensions for noise generation
+    num_samples = w * h
+    final_values = []
+
+    # Process the existing image if provided
+    if existing_image:
+        existing_image = existing_image.resize((w, h))  # Resize to match noise size
+        existing_image_np = np.array(existing_image) / 255.0  # Normalize to [0, 1] range
+
+    # Generate random noise (assuming generateRandomNoise, generatePerlinNoise, generateSimplexNoise exist)
+    random = generateRandomNoise()  # Generate random noise
+    perlin = generatePerlinNoise()  # Generate Perlin noise
+    simplex = generateSimplexNoise()  # Generate Simplex noise
+
+    # Static values for HSV
+    static_val = np.empty(num_samples)
+    static_val.fill(0.5)
+
+    static_val2 = np.empty(num_samples)
+    static_val2.fill(1.0)
+
+    # Blend the noises
+    for a in range(0, w * h):
+        final_values.append(
+            (
+                (random[a] * 0.02)
+                + (((simplex[a] / 2) + 0.5) * 0.48)
+                + (((perlin[a] / 2) + 0.5) * 0.5)
+            )
+            / 3
+        )
+
+    h_samples = np.reshape(np.asarray(final_values), (w, h))
+    s_samples = np.reshape(static_val, (w, h))
+    v_samples = np.reshape(static_val2, (w, h))
+
+    # Stack HSV channels to create the HSV image
+    hsv_img = np.dstack([h_samples, s_samples, v_samples])
+
+    # Convert HSV to RGB
+    noise_image = Image.fromarray(np.uint8(hsv_img * 255), mode="HSV").convert("RGB")
+
+    # Optional: blend with existing image
+    if existing_image:
+        # Blend noise image and the existing image using a weighted sum
+        noise_image_np = np.array(noise_image) / 255.0
+        blended_image = (0.7 * noise_image_np + 0.3 * existing_image_np)
+        # blended_image = noise_image_np
+
+        blended_image = np.uint8(blended_image * 255)  # Convert back to [0, 255] range
+        blended_image = Image.fromarray(blended_image)
+    else:
+        blended_image = noise_image
+
+    # Return the blended or generated image directly (skip quantization)
+    blended_image = blended_image.quantize(colors=12)
+    blended_image.convert(mode="RGB")
+    return blended_image

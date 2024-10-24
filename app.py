@@ -27,75 +27,11 @@ TEMP_FOLDER = './temp'
 # Define the directory where your images are stored
 IMAGE_DIRECTORY = 'static/images/patterns'
 
-# @app.route('/download-image/<filename>', methods=['GET'])
-# def download_image(filename):
-#     try:
-#         # Build the full path to the file
-#         file_path = os.path.join(IMAGE_DIRECTORY, filename)
-
-#         # Check if the file exists
-#         if os.path.exists(file_path):
-#             # Send the file with the proper Content-Disposition header to trigger download
-#             return send_file(file_path, as_attachment=True, download_name=filename)
-#         else:
-#             abort(404)  # Return a 404 if the file is not found
-
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), 500  # Return error message if something goes wrong
-
-
-@app.route('/progress', methods=['POST'])
-def progress():
-    # Check if the request contains images
-    if 'images' not in request.files:
-        return Response("No images part in the request", status=400)
-
-    files = request.files.getlist('images')
-
-    # Generator function to stream progress
-    def generate():
-        try:
-            # Step 1: Image Uploading
-            yield f"data: Step 1: Images Uploaded \n\n"
-            time.sleep(1)  # Simulate the delay for processing
-
-            # Step 2: Image Preprocessing
-            yield f"data: Step 2: Image Preprocessing\n\n"
-            time.sleep(3)
-
-            # Step 3: Applying Filters
-            yield f"data: Step 3: Applying Filters\n\n"
-            time.sleep(3)
-
-            # Step 4: Generating Camouflage
-            yield f"data: Step 4: Generating Camouflage\n\n"
-            time.sleep(3)
-
-            # Step 5: Finishing
-            yield f"data: Step 5: Finishing\n\n"
-            time.sleep(3)
-
-            # Once processing is done, send the final image URL
-            image_url = "http://backend.intelilab.click/static/images/patterns/camouflaged_20240929010354.png"
-            yield f"data: Image processed. View at {image_url}\n\n"
-        
-        except Exception as e:
-            yield f"data: Error occurred: {str(e)}\n\n"
-
-    # Return the event-stream response
-    return Response(generate(), mimetype='text/event-stream')
-
 # Route to use the function from the other file
 @app.route('/health_check', methods=['GET'])
 def health_checker():
     print("Function Called for Health Check @ " + time.strftime("%Y%m%d-%H%M%S"))
     return jsonify({"result": "Server Running"})
-
-#_________________________________________________________________
-
-#________________________________________________________________
-
-
 
 # Allowed image extensions
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -168,67 +104,11 @@ def generate_camouflage():
 
     def generate():
         try:
-            wait_time = 4  # in seconds, change this value as needed
-            steps = [
-                {
-                    'id': 1,
-                    'description': 'Step 1: Collage has been generated.',
-                    'imageUrl': 'static/images/premade_images/v2/1.png',
-                    'waitTime': 4,
-                },
-
-                {
-                    'id': 2,
-                    'description': 'Step 2: Generated Noise Image',
-                    'imageUrl': 'static/images/premade_images/v2/2.png',
-                    'waitTime': 4,
-                },
-                {
-                    'id': 3,
-                    'description': 'Step 3: Analzed dominant colors',
-                    'imageUrl': 'static/images/premade_images/v2/3.png',
-                    'waitTime': 4,
-                },
-
-                {
-                    'id': 4,
-                    'description': 'Step 4: Applied colors to noise image',
-                    'imageUrl': 'static/images/premade_images/v2/4.png',
-                    'waitTime': 8,
-                },
-
-                {
-                    'id': 5,
-                    'description': 'Step 5: First Iteration of Tessellation Completed',
-                    'imageUrl': 'static/images/premade_images/v2/5.png',
-                    'waitTime': 20,
-                },
-
-                {
-                    'id': 6,
-                    'description': 'Step 6: Second Iteration of Tessellation Completed',
-                    'imageUrl': 'static/images/premade_images/v2/6.png',
-                    'waitTime': 20,
-                },
-
-                {
-                    'id': 7,
-                    'description': 'Step 7: Final Camouflage Generated',
-                    'imageUrl': 'static/images/premade_images/v2/7.png',
-                    'waitTime': 20,
-                },
-
-            ]
-            # for step in steps:
-            #     time.sleep(step['waitTime'])  # Wait before moving to the next step
-            #     yield f'data: {{"id": {step["id"]}, "description": "{step["description"]}", "imageUrl": "{base_url}{step["imageUrl"]}", "status": "completed"}}\n\n'
-            
-            
-
+        
             ##########################################################################
             #                            Step 1: Collage Generation                  #
             ##########################################################################
-            # make the first collage with given input images
+            
             initial_collage_path, first_collage_img = generate_first_collage(image_path_list, timestamp)
 
             initial_collage_path_url = initial_collage_path.replace('./', '')
@@ -236,26 +116,14 @@ def generate_camouflage():
 
             yield f'data: {{"id": {1}, "description": "Collage has been generated", "imageUrl": "{initial_collage_path_url}","status": "completed"}}\n\n'
 
-
-
-            # time.sleep(1)  # Simulate the delay for processing
-            # collage_from_GAN = generate_camouflage_and_collage(folder_path, env_type, timestamp)
-            # # Remove './static/' to get the relative path
-            # relative_path = collage_from_GAN.replace('./static/', '')
-            # # Concatenate base_url with relative_path to create full URL
-            # url_for_gan_collage = f"{base_url}static/{relative_path}"
-            # yield f"data: Step 2: Passing to Model to generate GAN Pattern. image_url: {url_for_gan_collage} \n\n "
-            # yield f'data: {{"id": 1, "description": "", "imageUrl": "{base_url}{step["imageUrl"]}", "status": "completed"}}\n\n'
-            
-            # time.sleep(5)
-
-
             ##########################################################################
             #                             Step 2: Generated Noise Image              #
             ##########################################################################
 
-            noise_image = "I'M Noise Image"
-
+            noise_image_path , noise_image = generate_camouflage_and_collage(env_folder=folder_path,env_type=env_type, folder_id=timestamp)
+            noise_image_path_url = noise_image_path.replace('./', '')
+            noise_image_path_url = f"{base_url}{noise_image_path_url}"
+            yield f'data: {{"id": {2}, "description": "Generated Noise Image", "imageUrl": "{noise_image_path_url}","status": "completed"}}\n\n'
 
             ##########################################################################
             #                             Step 3: Analyzed dominant colors           #
@@ -274,6 +142,7 @@ def generate_camouflage():
             qunatized_swaped_image_url = qunatized_swaped_image_path.replace('./', '')
             qunatized_swaped_image_url = f"{base_url}{qunatized_swaped_image_url}"
             yield f'data: {{"id": {4}, "description": "Applied colors to noise image", "imageUrl": "{qunatized_swaped_image_url}","status": "completed"}}\n\n'
+            
             ##########################################################################
             #            Step 5: First Iteration of Tessellation Completed           #
             ##########################################################################
@@ -283,6 +152,7 @@ def generate_camouflage():
             first_voronoi_url = first_voronoi_path.replace('./', '')
             first_voronoi_url = f"{base_url}{first_voronoi_url}"
             yield f'data: {{"id": {5}, "description": "First Iteration of Tessellation Completed", "imageUrl": "{first_voronoi_url}","status": "completed"}}\n\n'
+            
             ##########################################################################
             #            Step 6: Second Iteration of Tessellation Completed           #
             ##########################################################################

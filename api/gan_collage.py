@@ -8,6 +8,8 @@ import torchvision.transforms as transforms
 import random
 import math
 
+from api.noise_image_generation import generateNoiseImageGAN
+
 # Define the Generator
 class Generator(nn.Module):
     def __init__(self, input_channels=3, output_channels=3):
@@ -100,15 +102,19 @@ def create_collage(images,folder_id, w=400, h=400, aspect=1.77):
             collage.paste(resized_image, (x * w, y * h))
 
      # Create a unique folder path for this upload
-    folder_path = os.path.join("./static/images/patterns/", folder_id)
+    # folder_path = os.path.join("./static/images/patterns/", folder_id)
     # Make the directory if it doesn't exist
-    os.makedirs(folder_path, exist_ok=True)
+    # os.makedirs(folder_path, exist_ok=True)
 
-    collage_img_path = f"{folder_path}/gan_generated_collage.jpg"
+    # collage_img_path = f"{folder_path}/gan_generated_collage.jpg"
     # Save the final collage image
-    collage.save(collage_img_path)
+    # collage.save(collage_img_path)
 
-    return collage_img_path
+    final_gan_noise_collage = generateNoiseImageGAN(collage)
+    gan_noise_image_path = f"./static/images/patterns/{folder_id}/gan_generated_noise_collage.png"
+    final_gan_noise_collage.save(gan_noise_image_path, 'PNG')
+
+    return gan_noise_image_path,final_gan_noise_collage
 
 
 # Define the model directory
@@ -191,6 +197,6 @@ def generate_camouflage_and_collage(env_folder, env_type,folder_id):
         camouflaged_images.append(camo_img_pil)
     print("done model load",len(camouflaged_images))
     # Create the collage from camouflaged images
-    generated_collage = create_collage(camouflaged_images,folder_id, w=400, h=400)
+    generated_collage_path,final_gan_noise_collage = create_collage(camouflaged_images,folder_id, w=400, h=400)
 
-    return generated_collage
+    return generated_collage_path,final_gan_noise_collage
