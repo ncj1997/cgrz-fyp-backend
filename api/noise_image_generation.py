@@ -37,7 +37,7 @@ def generatePerlinNoise():
 
 
 
-def generateNoiseImage(folder_id, existing_image_path=None ):
+def generate_noise_image(folder_id, existing_image_path=None ):
     (w, h) = (1000, 1000)  # Dimensions for noise generation
     num_samples = w * h
     final_values = []
@@ -106,7 +106,7 @@ def generateNoiseImage(folder_id, existing_image_path=None ):
 
     blended_image.save(noise_img_path, 'PNG')
 
-    return noise_img_path
+    return noise_img_path, blended_image
 
 
 # import os

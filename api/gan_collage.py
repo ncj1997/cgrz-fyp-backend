@@ -143,7 +143,7 @@ def get_model_path(env_type):
 #     print(f"Invalid environment type: {env_type}")
 
 # Function to generate camouflaged images and create a collage
-def generate_camouflage_and_collage(env_folder, env_type,folder_id):
+def generate_GAN_noise_collage(env_folder, env_type,folder_id):
     # Initialize the models
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     netG = Generator().to(device)
@@ -169,7 +169,7 @@ def generate_camouflage_and_collage(env_folder, env_type,folder_id):
     dataset = EnvironmentDataset(env_folder, env_transform=env_transform)
     dataloader = DataLoader(dataset, batch_size=1, shuffle=True)
 
-    camouflaged_images = []
+    noised_images = []
     # Generate camouflage for a few images
     for i, real_env in enumerate(dataloader):
         if i >= len(dataset):
@@ -188,9 +188,8 @@ def generate_camouflage_and_collage(env_folder, env_type,folder_id):
         camo_img_pil = transforms.ToPILImage()(camo_img)
 
         # Save camouflaged image to the list
-        camouflaged_images.append(camo_img_pil)
-    print("done model load",len(camouflaged_images))
+        noised_images.append(camo_img_pil)
     # Create the collage from camouflaged images
-    generated_collage = create_collage(camouflaged_images,folder_id, w=400, h=400)
+    generated_GAN_noise_collage_path = create_collage(noised_images,folder_id, w=400, h=400)
 
-    return generated_collage
+    return generated_GAN_noise_collage_path.replace('./', '')
