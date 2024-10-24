@@ -108,16 +108,3 @@ def generateNoiseImage(folder_id, existing_image_path=None ):
     return noise_img_path
 
 
-# import os
-
-
-# def generateNoiseImage(folder_id, existing_image_path=None):
-  
-
-#     folder_id  = 1727933006
-#     folder_path = os.path.join("./static/images/patterns/", folder_id)
-#     noise_img_path = f"{folder_path}/generated_noise_blended_image.jpg"
-
-#     return noise_img_path
-
-

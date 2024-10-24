@@ -3,10 +3,13 @@ import os
 import random
 import time
 import cv2
+from api.color_workload import apply_colors_noise_image, color_platte_generation
 
 from api.first_collage import generate_first_collage
 from api.gan_collage import generate_camouflage_and_collage
 from api.noise_image_generation import generateNoiseImage
+import api.teselation_workload
+
 from flask import Flask, Response, abort, jsonify, request, send_file, send_from_directory, url_for
 import numpy as np
 import api.gan_collage as gan_collage  # Import the function from the separate file
@@ -15,7 +18,7 @@ from PIL import Image
 
 from flask_cors import CORS
 
-from api.yolo_application import SAVE_DIR, check_detection, sse_stream # type: ignore
+from api.yolo_application import check_detection, yolo_application
 app = Flask(__name__)
 CORS(app)
 
@@ -244,61 +247,50 @@ def generate_camouflage():
             
             # time.sleep(5)
 
-
-
+            # collage_from_above = "Collage_Image_Comes Here"
 
             ##########################################################################
             #                             Step 2: Generated Noise Image              #
             ##########################################################################
 
-
-
+            noise_image = "I'M Noise Image"
 
 
             ##########################################################################
             #                             Step 3: Analyzed dominant colors           #
             ##########################################################################
 
-
-
-
+            color_platte_img_path, bar_colors = color_platte_generation(collage_im_resize=collage_from_above)
+            print(color_platte_img_path)
 
             ##########################################################################
             #                             Step 4: Applied colors to noise image      #
             ##########################################################################
 
-
-
-
+            qunatized_swaped_image_path , qunatized_swaped_image = apply_colors_noise_image(noise_image=noise_image,barcolors=bar_colors,folder_id=timestamp)
+            print(qunatized_swaped_image_path)
             ##########################################################################
             #            Step 5: First Iteration of Tessellation Completed           #
             ##########################################################################
 
-
-
-
-
-            ##########################################################################
-            #            Step 6: First Iteration of Tessellation Completed           #
-            ##########################################################################
-
-
-
-
+            first_veronoi_path, first_veranoi = api.teselation_workload.first_iteration(quantized_swapped_colors=qunatized_swaped_image, folder_id=timestamp)
+            print(first_veronoi_path)
 
             ##########################################################################
-            #            Step 7: Second Iteration of Tessellation Completed          #
+            #            Step 6: Second Iteration of Tessellation Completed           #
             ##########################################################################
 
+            single_color = api.teselation_workload.single_color_fun(first_veranoi)
 
+            second_veronoi_path, second_veranoi = api.teselation_workload.second_iteration(first_voronoi=first_veranoi,single_color=single_color,folder_id=timestamp)
+            print(second_veronoi_path)
 
-            # # Step 3: 
-            # noise_blend_image = generateNoiseImage(folder_id=timestamp, existing_image_path=collage_from_GAN)
-            # yield f"data: Step 3: Generate Noise Blended Image. image_url: {noise_blend_image}\n\n"
-            # time.sleep(1)
+            ##########################################################################
+            #            Step 7: Final Pattern Generation Completed                  #
+            ##########################################################################
 
-
-
+            final_pattern_path = api.teselation_workload.final_comouflague(single_color=single_color,second_veranoi=second_veranoi)
+            print(final_pattern_path)
 
 
         except Exception as e:
@@ -359,7 +351,7 @@ def apply_camouflage():
     # Get the list of objects for the specified object type
     selected_objects = object_types.get(object_type, [])
 
-    final_applied_images = sse_stream(env_image, camo_image, selected_objects, base_url)
+    final_applied_images = yolo_application(env_image, camo_image, selected_objects, base_url)
 
 
     detection_result = check_detection(final_applied_images,selected_objects)
