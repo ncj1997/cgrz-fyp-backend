@@ -229,10 +229,12 @@ def generate_camouflage():
             #                            Step 1: Collage Generation                  #
             ##########################################################################
             # make the first collage with given input images
-            initial_collage_path = generate_first_collage(image_path_list, timestamp)
-            print("initial_collage_path", initial_collage_path)
-            # yield f'data: {{"id": {steps["id"]}, "description": "{steps["description"]}", "imageUrl": "{initial_collage_path}", "status": "completed"}}\n\n'
-            yield f"data: Step 1: Collage has been generated. image_url: {initial_collage_path}\n\n"
+            initial_collage_path, first_collage_img = generate_first_collage(image_path_list, timestamp)
+
+            initial_collage_path_url = initial_collage_path.replace('./', '')
+            initial_collage_path_url = f"{base_url}{initial_collage_path_url}"
+
+            yield f'data: {{"id": {1}, "description": "Collage has been generated", "imageUrl": "{initial_collage_path_url}","status": "completed"}}\n\n'
 
 
 
@@ -247,7 +249,6 @@ def generate_camouflage():
             
             # time.sleep(5)
 
-            # collage_from_above = "Collage_Image_Comes Here"
 
             ##########################################################################
             #                             Step 2: Generated Noise Image              #
@@ -260,37 +261,49 @@ def generate_camouflage():
             #                             Step 3: Analyzed dominant colors           #
             ##########################################################################
 
-            color_platte_img_path, bar_colors = color_platte_generation(collage_im_resize=collage_from_above)
-            print(color_platte_img_path)
+            color_platte_img_path, bar_colors = color_platte_generation(collage_im_resize=first_collage_img, folder_id=timestamp)
+            color_platte_img_url = color_platte_img_path.replace('./', '')
+            color_platte_img_url = f"{base_url}{color_platte_img_url}"
+            yield f'data: {{"id": {3}, "description": "Analyzed dominant colors", "imageUrl": "{color_platte_img_url}","status": "completed"}}\n\n'
 
             ##########################################################################
             #                             Step 4: Applied colors to noise image      #
             ##########################################################################
 
-            qunatized_swaped_image_path , qunatized_swaped_image = apply_colors_noise_image(noise_image=noise_image,barcolors=bar_colors,folder_id=timestamp)
-            print(qunatized_swaped_image_path)
+            qunatized_swaped_image_path, qunatized_swaped_image = apply_colors_noise_image(noise_image=noise_image,barcolors=bar_colors,folder_id=timestamp)
+            qunatized_swaped_image_url = qunatized_swaped_image_path.replace('./', '')
+            qunatized_swaped_image_url = f"{base_url}{qunatized_swaped_image_url}"
+            yield f'data: {{"id": {4}, "description": "Applied colors to noise image", "imageUrl": "{qunatized_swaped_image_url}","status": "completed"}}\n\n'
             ##########################################################################
             #            Step 5: First Iteration of Tessellation Completed           #
             ##########################################################################
 
-            first_veronoi_path, first_veranoi = api.teselation_workload.first_iteration(quantized_swapped_colors=qunatized_swaped_image, folder_id=timestamp)
-            print(first_veronoi_path)
-
+            first_voronoi_path, first_veranoi = api.teselation_workload.first_iteration(quantized_swapped_colors=qunatized_swaped_image, folder_id=timestamp)
+            print(first_voronoi_path)
+            first_voronoi_url = first_voronoi_path.replace('./', '')
+            first_voronoi_url = f"{base_url}{first_voronoi_url}"
+            yield f'data: {{"id": {5}, "description": "First Iteration of Tessellation Completed", "imageUrl": "{first_voronoi_url}","status": "completed"}}\n\n'
             ##########################################################################
             #            Step 6: Second Iteration of Tessellation Completed           #
             ##########################################################################
 
             single_color = api.teselation_workload.single_color_fun(first_veranoi)
 
-            second_veronoi_path, second_veranoi = api.teselation_workload.second_iteration(first_voronoi=first_veranoi,single_color=single_color,folder_id=timestamp)
-            print(second_veronoi_path)
+            second_voronoi_path, second_voronoi = api.teselation_workload.second_iteration(first_voronoi=first_veranoi,single_color=single_color,folder_id=timestamp)
+            print(second_voronoi_path)
+            second_voronoi_url = second_voronoi_path.replace('./', '')
+            second_voronoi_url = f"{base_url}{second_voronoi_url}"
+            yield f'data: {{"id": {6}, "description": "Second Iteration of Tessellation Completed", "imageUrl": "{second_voronoi_url}","status": "completed"}}\n\n'
 
             ##########################################################################
             #            Step 7: Final Pattern Generation Completed                  #
             ##########################################################################
 
-            final_pattern_path = api.teselation_workload.final_comouflague(single_color=single_color,second_veranoi=second_veranoi)
+            final_pattern_path = api.teselation_workload.final_comouflague(single_color=single_color,second_veranoi=second_voronoi,folder_id=timestamp)
             print(final_pattern_path)
+            final_pattern_url = final_pattern_path.replace('./', '')
+            final_pattern_url = f"{base_url}{final_pattern_url}"
+            yield f'data: {{"id": {7}, "description": "Final Camouflage Generated", "imageUrl": "{final_pattern_url}","status": "completed"}}\n\n'
 
 
         except Exception as e:

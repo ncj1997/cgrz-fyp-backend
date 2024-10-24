@@ -44,4 +44,4 @@ def generate_first_collage(images, timestamp):
 
     first_collage_img.save(first_collage_path, 'PNG')
 
-    return first_collage_path
+    return first_collage_path, first_collage_img

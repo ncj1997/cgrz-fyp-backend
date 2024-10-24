@@ -5,7 +5,7 @@ from PIL import Image
 import io
 
 
-def color_platte_generation(collage_im_resize):
+def color_platte_generation(collage_im_resize, folder_id):
 # Save the image to an in-memory file
     with io.BytesIO() as file_object:
         collage_im_resize.save(file_object, "PNG")
@@ -33,7 +33,6 @@ def color_platte_generation(collage_im_resize):
 
         # Display the image
         # display(barImg)
-
         folder_path = os.path.join("./static/images/patterns/", folder_id)
 
         color_platte_img_path = f"{folder_path}/colour_platte_image.png"
