@@ -13,7 +13,7 @@ from PIL import Image
 
 from flask_cors import CORS
 
-from api.yolo_application import SAVE_DIR, check_detection, sse_stream # type: ignore
+from api.yolo_application import check_detection, yolo_application
 app = Flask(__name__)
 CORS(app)
 
@@ -350,7 +350,7 @@ def apply_camouflage():
     # Get the list of objects for the specified object type
     selected_objects = object_types.get(object_type, [])
 
-    final_applied_images = sse_stream(env_image, camo_image, selected_objects, base_url)
+    final_applied_images = yolo_application(env_image, camo_image, selected_objects, base_url)
 
 
     detection_result = check_detection(final_applied_images,selected_objects)
