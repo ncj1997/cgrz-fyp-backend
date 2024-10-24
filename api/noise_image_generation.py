@@ -98,7 +98,6 @@ def generateNoiseImage(folder_id, existing_image_path=None ):
     blended_image.convert(mode="RGB")
     
     folder_path = os.path.join("./static/images/patterns/", folder_id)
-    print("folder path", folder_path)
 
     noise_img_path = f"{folder_path}/generated_noise_blended_image.png"
     print("noise image path", noise_img_path)

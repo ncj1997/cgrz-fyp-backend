@@ -3,6 +3,8 @@ import os
 import random
 import time
 import cv2
+
+from api.first_collage import generate_first_collage
 from api.gan_collage import generate_camouflage_and_collage
 from api.noise_image_generation import generateNoiseImage
 from flask import Flask, Response, abort, jsonify, request, send_file, send_from_directory, url_for
@@ -223,9 +225,14 @@ def generate_camouflage():
             ##########################################################################
             #                            Step 1: Collage Generation                  #
             ##########################################################################
+            # make the first collage with given input images
+            initial_collage = generate_first_collage(image_list, folder_path)
+
+
+
 
             # time.sleep(1)  # Simulate the delay for processing
-            # collage_from_GAN = generate_camouflage_and_collage(folder_path,env_type,timestamp)
+            # collage_from_GAN = generate_camouflage_and_collage(folder_path, env_type, timestamp)
             # # Remove './static/' to get the relative path
             # relative_path = collage_from_GAN.replace('./static/', '')
             # # Concatenate base_url with relative_path to create full URL

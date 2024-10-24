@@ -67,9 +67,11 @@ def save_image(tensor, path):
     image = unloader(tensor)
     image.save(path)
 
+
 # Function to denormalize the image tensor
 def denorm(tensor):
     return (tensor + 1) / 2
+
 
 # Function to create a collage of camouflaged images
 def create_collage(images,folder_id, w=400, h=400, aspect=1.77):
@@ -149,9 +151,7 @@ def generate_camouflage_and_collage(env_folder, env_type,folder_id):
     netG = Generator().to(device)
 
     # Load the pretrained camouflage generator model
-
-
-    model_file =  get_model_path(env_type)
+    model_file = get_model_path(env_type)
 
     print("Selected Model -  ", model_file)
 
