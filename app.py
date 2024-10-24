@@ -138,7 +138,7 @@ def generate_camouflage():
     # Make the directory if it doesn't exist
     os.makedirs(folder_path, exist_ok=True)
 
-    image_list = []
+    image_path_list = []
 
     for image_file in images:
         # Validate the image extension
@@ -154,10 +154,10 @@ def generate_camouflage():
             # Convert image to RGB if needed (Pillow might need this for certain formats)
             img = img.convert('RGB')
             # Define the path to save the image
-            image_path = os.path.join(folder_path, f"{image_file.filename}.jpg")
+            image_path = os.path.join(folder_path, f"{image_file.filename}")
             # Save the image as a JPEG (or you can use the original format)
             img.save(image_path, format='JPEG')  # Save as JPEG, but can be PNG or any other
-            image_list.append(image_path)
+            image_path_list.append(image_path)
         except Exception as e:
             return jsonify({'error': f"Error saving image {image_file.filename}: {e}"}), 400
     
@@ -173,7 +173,7 @@ def generate_camouflage():
                     'imageUrl': 'static/images/premade_images/v2/1.png',
                     'waitTime': 4,
                 },
-               
+
                 {
                     'id': 2,
                     'description': 'Step 2: Generated Noise Image',
@@ -186,14 +186,14 @@ def generate_camouflage():
                     'imageUrl': 'static/images/premade_images/v2/3.png',
                     'waitTime': 4,
                 },
-               
+
                 {
                     'id': 4,
                     'description': 'Step 4: Applied colors to noise image',
                     'imageUrl': 'static/images/premade_images/v2/4.png',
                     'waitTime': 8,
                 },
-               
+
                 {
                     'id': 5,
                     'description': 'Step 5: First Iteration of Tessellation Completed',
@@ -214,11 +214,11 @@ def generate_camouflage():
                     'imageUrl': 'static/images/premade_images/v2/7.png',
                     'waitTime': 20,
                 },
-               
+
             ]
-            for step in steps:
-                time.sleep(step['waitTime'])  # Wait before moving to the next step
-                yield f'data: {{"id": {step["id"]}, "description": "{step["description"]}", "imageUrl": "{base_url}{step["imageUrl"]}", "status": "completed"}}\n\n'
+            # for step in steps:
+            #     time.sleep(step['waitTime'])  # Wait before moving to the next step
+            #     yield f'data: {{"id": {step["id"]}, "description": "{step["description"]}", "imageUrl": "{base_url}{step["imageUrl"]}", "status": "completed"}}\n\n'
             
             
 
@@ -226,8 +226,10 @@ def generate_camouflage():
             #                            Step 1: Collage Generation                  #
             ##########################################################################
             # make the first collage with given input images
-            initial_collage = generate_first_collage(image_list, folder_path)
-
+            initial_collage_path = generate_first_collage(image_path_list, timestamp)
+            print("initial_collage_path", initial_collage_path)
+            # yield f'data: {{"id": {steps["id"]}, "description": "{steps["description"]}", "imageUrl": "{initial_collage_path}", "status": "completed"}}\n\n'
+            yield f"data: Step 1: Collage has been generated. image_url: {initial_collage_path}\n\n"
 
 
 

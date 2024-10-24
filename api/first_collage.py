@@ -1,14 +1,14 @@
 import os
-from random import random
 from PIL import Image
 import math
+import random
 
 
-def generate_first_collage(images, folder_path):
+def generate_first_collage(images, timestamp):
     resized_images = []
     for img in images:
-        image = folder_path + "/" + img
-        im = Image.open(image)
+        # image = timestamp + "/" + img
+        im = Image.open(img)
         im_resize = im.resize(
             (400, 400)
         )
@@ -33,10 +33,15 @@ def generate_first_collage(images, folder_path):
                 i = random.randrange(len(images))
             first_collage_img.paste(resized_images[i], (x * w, y * h))
 
-    folder_path = os.path.join("./static//", folder_path)
+    first_collage_img.resize((500, 500))
+
+    folder_path = os.path.join("./static/images/patterns/", timestamp)
+
+    # Make the directory if it doesn't exist
+    os.makedirs(folder_path, exist_ok=True)
 
     first_collage_path = f"{folder_path}/first_collage_image.png"
 
     first_collage_img.save(first_collage_path, 'PNG')
 
-    return first_collage_img
+    return first_collage_path
