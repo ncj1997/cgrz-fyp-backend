@@ -4,21 +4,18 @@ import random
 import time
 import cv2
 from api.color_workload import apply_colors_noise_image, color_platte_generation
-
 from api.first_collage import generate_first_collage
 from api.gan_collage import generate_camouflage_and_collage
 from api.noise_image_generation import generateNoiseImage
 import api.teselation_workload
-
 from flask import Flask, Response, abort, jsonify, request, send_file, send_from_directory, url_for
 import numpy as np
 import api.gan_collage as gan_collage  # Import the function from the separate file
-# import api.pattern_gen as pattern_gen
 from PIL import Image
-
 from flask_cors import CORS
 
 from api.yolo_application import check_detection, yolo_application
+
 app = Flask(__name__)
 CORS(app)
 
@@ -27,11 +24,13 @@ TEMP_FOLDER = './temp'
 # Define the directory where your images are stored
 IMAGE_DIRECTORY = 'static/images/patterns'
 
+
 # Route to use the function from the other file
 @app.route('/health_check', methods=['GET'])
 def health_checker():
     print("Function Called for Health Check @ " + time.strftime("%Y%m%d-%H%M%S"))
     return jsonify({"result": "Server Running"})
+
 
 # Allowed image extensions
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
@@ -39,9 +38,11 @@ ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 # Allowed environment types
 ALLOWED_ENV_TYPES = {'forest', 'desert', 'snowy', 'urban'}
 
+
 # Function to check if the file extension is allowed
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 # Check if the uploaded file is an image
 def is_image_file(file):
@@ -55,7 +56,6 @@ def is_image_file(file):
 
 @app.route('/generate-camouflage', methods=['POST'])
 def generate_camouflage():
-    
     print("Function Called for Generating Camo" + time.strftime("%Y%m%d-%H%M%S"))
 
     env_type = request.form.get('env_type')
@@ -68,12 +68,12 @@ def generate_camouflage():
     # Validate that images are uploaded
     if not images:
         return jsonify({'error': 'No images uploaded'}), 400
-    
+
     timestamp = str(int(time.time()))  # This will create a folder named by the Unix timestamp
-    
+
     # Create a unique folder path for this upload
     folder_path = os.path.join("./temp/", timestamp)
-    
+
     # Make the directory if it doesn't exist
     os.makedirs(folder_path, exist_ok=True)
 
@@ -83,7 +83,7 @@ def generate_camouflage():
         # Validate the image extension
         if not allowed_file(image_file.filename):
             return jsonify({'error': f'File {image_file.filename} is not an allowed image type'}), 400
-        
+
         # Check if the uploaded file is a valid image
         if not is_image_file(image_file):
             return jsonify({'error': f'File {image_file.filename} is not a valid image'}), 400
@@ -99,16 +99,16 @@ def generate_camouflage():
             image_path_list.append(image_path)
         except Exception as e:
             return jsonify({'error': f"Error saving image {image_file.filename}: {e}"}), 400
-    
+
     base_url = request.host_url
 
     def generate():
         try:
-        
+
             ##########################################################################
             #                            Step 1: Collage Generation                  #
             ##########################################################################
-            
+
             initial_collage_path, first_collage_img = generate_first_collage(image_path_list, timestamp)
 
             initial_collage_path_url = initial_collage_path.replace('./', '')
@@ -120,7 +120,8 @@ def generate_camouflage():
             #                             Step 2: Generated Noise Image              #
             ##########################################################################
 
-            noise_image_path , noise_image = generate_camouflage_and_collage(env_folder=folder_path,env_type=env_type, folder_id=timestamp)
+            noise_image_path, noise_image = generate_camouflage_and_collage(env_folder=folder_path, env_type=env_type,
+                                                                            folder_id=timestamp)
             noise_image_path_url = noise_image_path.replace('./', '')
             noise_image_path_url = f"{base_url}{noise_image_path_url}"
             yield f'data: {{"id": {2}, "description": "Generated Noise Image", "imageUrl": "{noise_image_path_url}","status": "completed"}}\n\n'
@@ -129,7 +130,8 @@ def generate_camouflage():
             #                             Step 3: Analyzed dominant colors           #
             ##########################################################################
 
-            color_platte_img_path, bar_colors = color_platte_generation(collage_im_resize=first_collage_img, folder_id=timestamp)
+            color_platte_img_path, bar_colors = color_platte_generation(collage_im_resize=first_collage_img,
+                                                                        folder_id=timestamp)
             color_platte_img_url = color_platte_img_path.replace('./', '')
             color_platte_img_url = f"{base_url}{color_platte_img_url}"
             yield f'data: {{"id": {3}, "description": "Analyzed dominant colors", "imageUrl": "{color_platte_img_url}","status": "completed"}}\n\n'
@@ -138,28 +140,33 @@ def generate_camouflage():
             #                             Step 4: Applied colors to noise image      #
             ##########################################################################
 
-            qunatized_swaped_image_path, qunatized_swaped_image = apply_colors_noise_image(noise_image=noise_image,barcolors=bar_colors,folder_id=timestamp)
+            qunatized_swaped_image_path, qunatized_swaped_image = apply_colors_noise_image(noise_image=noise_image,
+                                                                                           barcolors=bar_colors,
+                                                                                           folder_id=timestamp)
             qunatized_swaped_image_url = qunatized_swaped_image_path.replace('./', '')
             qunatized_swaped_image_url = f"{base_url}{qunatized_swaped_image_url}"
             yield f'data: {{"id": {4}, "description": "Applied colors to noise image", "imageUrl": "{qunatized_swaped_image_url}","status": "completed"}}\n\n'
-            
+
             ##########################################################################
             #            Step 5: First Iteration of Tessellation Completed           #
             ##########################################################################
 
-            first_voronoi_path, first_veranoi = api.teselation_workload.first_iteration(quantized_swapped_colors=qunatized_swaped_image, folder_id=timestamp)
+            first_voronoi_path, first_veranoi = api.teselation_workload.first_iteration(
+                quantized_swapped_colors=qunatized_swaped_image, folder_id=timestamp)
             print(first_voronoi_path)
             first_voronoi_url = first_voronoi_path.replace('./', '')
             first_voronoi_url = f"{base_url}{first_voronoi_url}"
             yield f'data: {{"id": {5}, "description": "First Iteration of Tessellation Completed", "imageUrl": "{first_voronoi_url}","status": "completed"}}\n\n'
-            
+
             ##########################################################################
             #            Step 6: Second Iteration of Tessellation Completed           #
             ##########################################################################
 
             single_color = api.teselation_workload.single_color_fun(first_veranoi)
 
-            second_voronoi_path, second_voronoi = api.teselation_workload.second_iteration(first_voronoi=first_veranoi,single_color=single_color,folder_id=timestamp)
+            second_voronoi_path, second_voronoi = api.teselation_workload.second_iteration(first_voronoi=first_veranoi,
+                                                                                           single_color=single_color,
+                                                                                           folder_id=timestamp)
             print(second_voronoi_path)
             second_voronoi_url = second_voronoi_path.replace('./', '')
             second_voronoi_url = f"{base_url}{second_voronoi_url}"
@@ -169,7 +176,9 @@ def generate_camouflage():
             #            Step 7: Final Pattern Generation Completed                  #
             ##########################################################################
 
-            final_pattern_path = api.teselation_workload.final_comouflague(single_color=single_color,second_veranoi=second_voronoi,folder_id=timestamp)
+            final_pattern_path = api.teselation_workload.final_comouflague(single_color=single_color,
+                                                                           second_veranoi=second_voronoi,
+                                                                           folder_id=timestamp)
             print(final_pattern_path)
             final_pattern_url = final_pattern_path.replace('./', '')
             final_pattern_url = f"{base_url}{final_pattern_url}"
@@ -195,18 +204,16 @@ def add_timestamp_to_filename(filename):
 
 @app.route('/apply_camouflage', methods=['POST'])
 def apply_camouflage():
+    base_url = request.host_url.rstrip('/')
 
-
-    base_url = request.host_url.rstrip('/') 
-    
     # Check if the environment image file is provided
     if 'environment_image' not in request.files:
         return jsonify({'error': 'Environment image file is missing'}), 400
-    
+
     # Check if the camouflage image file is provided
     if 'camouflage_image' not in request.files:
         return jsonify({'error': 'Camouflage image file is missing'}), 400
-    
+
     # Check if the object type is provided in the form data
     if 'object_type' not in request.form:
         return jsonify({'error': 'Object type is missing'}), 400
@@ -223,31 +230,28 @@ def apply_camouflage():
 
     if not object_type or object_type not in object_types:
         return jsonify({'error': 'Invalid or missing object type'}), 400
-    
 
     # Load the images
     env_image = cv2.imdecode(np.frombuffer(env_image_file.read(), np.uint8), cv2.IMREAD_COLOR)
     camo_image = cv2.imdecode(np.frombuffer(camo_image_file.read(), np.uint8), cv2.IMREAD_COLOR)
-
-    
 
     # Get the list of objects for the specified object type
     selected_objects = object_types.get(object_type, [])
 
     final_applied_images = yolo_application(env_image, camo_image, selected_objects, base_url)
 
+    detection_result = check_detection(final_applied_images, selected_objects)
 
-    detection_result = check_detection(final_applied_images,selected_objects)
-
-        # Use os.path.relpath to get the relative path from the static folder
+    # Use os.path.relpath to get the relative path from the static folder
     relative_path = os.path.relpath(final_applied_images, start='static')
-    
+
     image_url = f"{base_url}/static/{relative_path.replace(os.sep, '/')}"
 
     # image_url = f"{base_url}/static/camafalgues/camouflaged_step3_20241023214499.png"
 
     # Return the image URL as JSON
-    return jsonify({'image_url': image_url,'detection_result': detection_result})
+    return jsonify({'image_url': image_url, 'detection_result': detection_result})
+
 
 @app.route('/static/images/<path:subdir>/<filename>')
 def download_image(subdir, filename):
@@ -261,6 +265,7 @@ def download_image(subdir, filename):
         return send_file(path, as_attachment=True, download_name=random_filename)
     except Exception as e:
         return str(e), 404  # Return 404 error if file not found or any error occurs
+
 
 # # Serve the camouflaged image
 # @app.route('/static/camafalgues/<filename>')

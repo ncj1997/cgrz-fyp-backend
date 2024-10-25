@@ -4,7 +4,6 @@ import math
 import random
 import numpy as np
 import cv2
-
 from tensorflow.keras.applications.resnet50 import ResNet50, preprocess_input, decode_predictions
 from tensorflow.keras.preprocessing import image
 
@@ -59,6 +58,7 @@ def detect_and_remove_sky_from_list(image_list, threshold=0.1):
 
     return image_list
 
+
 def check_blue_dominance(img):
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
@@ -74,6 +74,7 @@ def check_blue_dominance(img):
 
     # If more than 30% of the image is blue, it's likely to contain sky
     return blue_ratio > 0.3
+
 
 def generate_first_collage(images, timestamp):
     resized_images = []
